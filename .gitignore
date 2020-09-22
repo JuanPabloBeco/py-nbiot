@@ -1,4 +1,4 @@
 constants.py
 .vscode
-env
+venv
 __pycache__
