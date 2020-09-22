@@ -5,14 +5,14 @@ import serial
 from send_cmd import send_cmd
 
 import json
-def setup(ser):
+def enter_pin(ser):
     response_history=[]
 
-    cmd_response = send_cmd("AT", ser,  print_response=True, ms_of_after_delay=100)
-    response_history.append(cmd_response)
+    #cmd_response = send_cmd("AT", ser,  print_response=True, ms_of_delay_after=100)
+    #response_history.append(cmd_response)
     cmd_response = send_cmd("AT+CPIN?", ser, 6,  print_response=True)
     response_history.append(cmd_response)
-    cmd_response = send_cmd("AT+CPIN=" + MY_PHONE_PASS, ser, 8,  print_response=True, ms_of_after_delay=10000)
+    cmd_response = send_cmd("AT+CPIN=" + MY_PHONE_PASS, ser, 8,  print_response=True, ms_of_delay_after=10000)
     response_history.append(cmd_response)
 
     if response_history[-1]["status"] == "ERROR":
@@ -21,7 +21,8 @@ def setup(ser):
         return(response)
 
     #do while response != 0,1 y ver si hacerlo saltar despues de que pase 2 o 3 veces
-    cmd_response = send_cmd("AT+CEREG?", ser, 4, print_response=True, ms_of_after_delay=15000)
+    
+    cmd_response = send_cmd("AT+CEREG?", ser, 4, print_response=True, ms_of_delay_after=15000)
     response_history.append(cmd_response)
 
     detailed_response = [s for s in response_history[-1] if "+" in s]
