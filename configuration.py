@@ -10,56 +10,71 @@ def start_up_nbiot(ser):
     cmd_response = send_cmd("AT", ser,  print_response=True, ms_of_delay_after=100)
     response_history.append(cmd_response)
 
-    enter_pin_response = enter_pin(ser, response_history)
-    if enter_pin_response["status"] == "ERROR":
-        return(enter_pin_response)
+    res = enter_pin(ser, response_history)
+    if res["status"] == "ERROR":
+        return(res)
     
-    check_nbiot_response = check_nbiot_conection(ser, response_history=enter_pin_response["response_history"])
-    if check_nbiot_response["status"] == "ERROR":
-        return(check_nbiot_response)
-    return(check_nbiot_response)
+    res = check_nbiot_conection(ser, response_history=res["response_history"])
+    if res["status"] == "ERROR":
+        return(res)
+    return(res)
+
+    #TODO: log response_history
+    #TODO: check if retries are needed
+
+def optimized_start_up_nbiot(ser):
+    response_history=[]
+
+    res = enter_pin(ser, response_history)
+    if res["status"] == "ERROR":
+        return(res)
+    
+    res = check_nbiot_conection(ser, response_history=res["response_history"])
+    if res["status"] == "ERROR":
+        return(res)
+    return(res)
 
     #TODO: log response_history
     #TODO: check if retries are needed
 
 def check_nbiot_conection(ser, retries=3, response_history=[], custom_delay=2000):
     while True:
-        cmd_response = send_cmd("AT+CEREG?", ser, 4, print_response=True, ms_of_delay_after=custom_delay)
-        response_history.append(cmd_response)
-        detailed_cmd_response = cmd_response["response"][1][0:-2] # [0,-2] to remove \r\n
+        res = send_cmd("AT+CEREG?", ser, 4, print_response=True, ms_of_delay_after=custom_delay)
+        response_history.append(res)
+        detailed_res = res["response"][1][0:-2] # [0,-2] to remove \r\n
 
-        if detailed_cmd_response == "+CEREG: 0,1":
-            message = "Registered, home network - " + detailed_cmd_response
+        if detailed_res == "+CEREG: 0,1":
+            message = "Registered, home network - " + detailed_res
             status = "OK"
             break
-        elif detailed_cmd_response == "+CEREG: 0,0":
+        elif detailed_res == "+CEREG: 0,0":
             retries = retries -1
             if retries == 0:
-                message = "Not registered. MT is not currently searching an operator to register to - " + detailed_cmd_response
+                message = "Not registered. MT is not currently searching an operator to register to - " + detailed_res
                 status = "ERROR"
                 break
-        elif detailed_cmd_response == "+CEREG: 0,2":
+        elif detailed_res == "+CEREG: 0,2":
             retries = retries -1
             if retries == 0:
-                message = "Not registered, but MT is currently trying to attach or searching an operator to register to - " + detailed_cmd_response
+                message = "Not registered, but MT is currently trying to attach or searching an operator to register to - " + detailed_res
                 status = "ERROR"
                 break
-        elif detailed_cmd_response == "+CEREG: 0,3":
-            message = "Registration denied - " + detailed_cmd_response
+        elif detailed_res == "+CEREG: 0,3":
+            message = "Registration denied - " + detailed_res
             status = "ERROR"
             break
-        elif detailed_cmd_response == "+CEREG: 0,4":
-            message = "Unknown - " + detailed_cmd_response
+        elif detailed_res == "+CEREG: 0,4":
+            message = "Unknown - " + detailed_res
             status = "ERROR"
             break
-        elif detailed_cmd_response == "+CEREG: 0,5":
-            message = "Registered, roaming - " + detailed_cmd_response
+        elif detailed_res == "+CEREG: 0,5":
+            message = "Registered, roaming - " + detailed_res
             status = "OK"
             break
         else:
             retries -= 1
             if retries == 0:
-                message = "Unknown error - " + detailed_cmd_response
+                message = "Unknown error - " + detailed_res
                 status = "ERROR"
                 break
 

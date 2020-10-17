@@ -15,6 +15,18 @@ def setup_PDP_context(ser, id=1, response_history=[], retries=3, custom_delay=20
             status=activate_PDP_response['status']
             retries-=1
 
+def optimized_setup_PDP_context(ser, id=1, response_history=[], retries=3, custom_delay=2000, print_response=True):
+    status = 'first_round'
+    while True:
+        if status.find('OK') != -1 or status.find('ERROR') != -1 or retries == 0:
+            check_PDP_response = check_PDP_context(ser, id, retries=retries, response_history=response_history, custom_delay=custom_delay, print_response=print_response)
+            return(check_PDP_response)
+        else:
+            activate_PDP_response = activate_PDP_context(ser, id, retries=retries, response_history=response_history, custom_delay=custom_delay, print_response=print_response)
+            #response_history.append(activate_PDP_response['response_history'])
+            status=activate_PDP_response['status']
+            retries-=1
+
 def activate_PDP_context(ser, id=1, response_history=[], retries=3, custom_delay=2000, print_response=True):
     cmd_response = send_cmd("AT+QIACT="+str(id), ser,  print_response=print_response)
     #TODO: check if there is and 'ERROR' response maybe because it was already turn on
