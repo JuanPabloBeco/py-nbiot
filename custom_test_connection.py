@@ -17,21 +17,22 @@ Observation: To really measure energy further hardware is needed
 
 '''
 
-def conection_test():
-list = serial.tools.list_ports.comports()
-print(*list)
+def custom_test_connection(ser=-1):
+    list = serial.tools.list_ports.comports()
+    print(*list)
+    if (ser == -1):
+        ser = serial.Serial(port='COM4', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
 
-ser = serial.Serial(port='COM4', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
+    response = optimized_start_up_nbiot(ser)
 
-response = optimized_start_up_nbiot(ser)
+    response = optimized_setup_PDP_context(ser, response_history=response["response_history"], retries=3, custom_delay=1000)
 
-response = optimized_setup_PDP_context(ser, response_history=response["response_history"], retries=3, custom_delay=1000)
+    response = ping(ser, response_history=response["response_history"])
 
-print(ping(ser, response_history=response["response_history"]))
+    print(response)
 
-print_cmd_history(response)
+    ser.close()
 
-ser.close()
+    return response
 
-
-
+custom_test_connection()

@@ -27,7 +27,14 @@ def optimized_setup_PDP_context(ser, id=1, response_history=[], retries=3, custo
             status=activate_PDP_response['status']
             retries-=1
 
-def activate_PDP_context(ser, id=1, response_history=[], retries=3, custom_delay=2000, print_response=True):
+def activate_PDP_context(
+    ser, 
+    id=1, 
+    response_history=[], 
+    retries=3, 
+    custom_delay=2000, 
+    print_response=True
+    ):
     cmd_response = send_cmd("AT+QIACT="+str(id), ser,  print_response=print_response)
     #TODO: check if there is and 'ERROR' response maybe because it was already turn on
     response_history.append(cmd_response)
