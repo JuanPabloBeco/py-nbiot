@@ -19,7 +19,7 @@ response = setup_PDP_context(ser, response_history=response["response_history"])
 
 print_cmd_history(response)
 
-print(ping(ser, response_history=response["response_history"]))
+#print(ping(ser, response_history=response["response_history"]))
 
 ser.close()
 

@@ -3,7 +3,15 @@ import serial.tools.list_ports
 
 from time import sleep
 
-def read_extra_lines(ser, number_of_expected_lines=4, cmd='undefined', print_response=True, print_final_response=True, ms_of_delay_after=0, ms_of_delay_before=0):
+def read_extra_lines(
+    ser, 
+    number_of_expected_lines=4, 
+    cmd='undefined', 
+    print_response=True, 
+    print_final_response=True, 
+    ms_of_delay_after=0, 
+    ms_of_delay_before=0
+    ):
     
     def get_response(response, status):
         if ms_of_delay_after: sleep(ms_of_delay_after/1000)
@@ -37,9 +45,19 @@ def read_extra_lines(ser, number_of_expected_lines=4, cmd='undefined', print_res
     return(get_response(response_lines, "UNFINISHED"))
 
 
-def send_cmd(cmd, ser, number_of_expected_lines=4, print_response=True, print_final_response=True, ms_of_delay_after=0, ms_of_delay_before=0):
+def send_cmd(
+    cmd, 
+    ser, 
+    number_of_expected_lines=4, 
+    print_response=True, 
+    print_final_response=True, 
+    ms_of_delay_after=0, 
+    ms_of_delay_before=0,
+    custom_respons_end='',
+    ):
     
-    def get_response(response, status):
+    def get_response(response, 
+    status):
         if ms_of_delay_after: sleep(ms_of_delay_after/1000)
         return({"response": response, "status": status, "cmd": cmd})
 
@@ -70,6 +88,12 @@ def send_cmd(cmd, ser, number_of_expected_lines=4, print_response=True, print_fi
             if print_final_response and not print_response: 
                 print('> ' + res)
             return(get_response(response_lines, "ERROR"))
+
+        if (custom_respons_end != ''):
+            if (res.find(custom_respons_end) == 0):
+                if print_final_response and not print_response: 
+                    print('> ' + res)
+                return(get_response(response_lines, "OK"))
 
     if print_final_response: 
         print('> ' + res)

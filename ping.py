@@ -3,7 +3,16 @@ import serial
 from send_cmd import send_cmd, read_extra_lines
 from constants import MY_PHONE_PASS
 
-def ping(ser, context_id=1, host="8.8.8.8", timeout= 0, pingnum= 0, response_history=[], retries=3, custom_delay=2000, print_response=True):
+def ping(ser, 
+    context_id=1, 
+    host="8.8.8.8", 
+    timeout= 0, 
+    pingnum= 0, 
+    response_history=[], 
+    retries=3, 
+    custom_delay=2000, 
+    print_response=True
+):
     cmd = "AT+QPING=" + str(context_id) + "," + "\"" + host + "\""
     number_of_expected_lines=2*(4+1)
 
