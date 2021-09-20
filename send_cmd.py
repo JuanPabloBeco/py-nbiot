@@ -53,7 +53,7 @@ def send_cmd(
     print_final_response=True, 
     ms_of_delay_after=0, 
     ms_of_delay_before=0,
-    custom_respons_end='',
+    custom_response_end='',
     ):
     
     def get_response(response, 
@@ -89,8 +89,8 @@ def send_cmd(
                 print('> ' + res)
             return(get_response(response_lines, "ERROR"))
 
-        if (custom_respons_end != ''):
-            if (res.find(custom_respons_end) == 0):
+        if (custom_response_end != ''):
+            if (res.find(custom_response_end) == 0):
                 if print_final_response and not print_response: 
                     print('> ' + res)
                 return(get_response(response_lines, "OK"))
