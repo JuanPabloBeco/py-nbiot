@@ -2,3 +2,4 @@ constants.py
 .vscode
 venv
 __pycache__
+env

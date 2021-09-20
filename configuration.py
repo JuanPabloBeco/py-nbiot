@@ -68,42 +68,49 @@ def optimized_start_up_nbiot(ser, response_history=[]):
 
 def check_nbiot_conection(ser, retries=3, response_history=[], custom_delay=2000):
     while True:
+        res = send_cmd("AT+CEREG=2", ser, 4, print_response=True, ms_of_delay_after=custom_delay+2000)
         res = send_cmd("AT+CEREG?", ser, 4, print_response=True, ms_of_delay_after=custom_delay)
         response_history.append(res)
-        detailed_res = res["response"][1][0:-2] # [0,-2] to remove \r\n
+        # detailed_res = res["response"][1][0:-2] # [0,-2] to remove \r\n
 
-        if detailed_res == "+CEREG: 0,1":
-            message = "Registered, home network - " + detailed_res
+        temp = res['response'][1].split('\r\n')[0]
+        temp = temp.split(':')[1]
+        
+        temp = temp.split(',')
+        [n ,stat ,tracking_area_code, cell_id, access_technology] = temp
+
+        if stat == "1":
+            message = "Registered, home network - " + stat
             status = "OK"
             break
-        elif detailed_res == "+CEREG: 0,0":
+        elif stat == "0":
             retries = retries -1
             if retries == 0:
                 message = "Not registered. MT is not currently searching an operator to register to - " + detailed_res
                 status = "ERROR"
                 break
-        elif detailed_res == "+CEREG: 0,2":
+        elif stat == "2":
             retries = retries -1
             if retries == 0:
                 message = "Not registered, but MT is currently trying to attach or searching an operator to register to - " + detailed_res
                 status = "ERROR"
                 break
-        elif detailed_res == "+CEREG: 0,3":
-            message = "Registration denied - " + detailed_res
+        elif stat == "3":
+            message = "Registration denied - " + stat
             status = "ERROR"
             break
-        elif detailed_res == "+CEREG: 0,4":
-            message = "Unknown - " + detailed_res
+        elif stat == "4":
+            message = "Unknown - " + stat
             status = "ERROR"
             break
-        elif detailed_res == "+CEREG: 0,5":
-            message = "Registered, roaming - " + detailed_res
+        elif stat == "5":
+            message = "Registered, roaming - " + stat
             status = "OK"
             break
         else:
             retries -= 1
             if retries == 0:
-                message = "Unknown error - " + detailed_res
+                message = "Unknown error - " + stat
                 status = "ERROR"
                 break
 
