@@ -1,8 +1,11 @@
+import sys
+sys.path.append( '..' )
+
 from constants import MY_PHONE_PASS
 
 import serial
 
-from send_cmd import send_cmd
+from serial_tools.send_cmd import send_cmd
 
 import json
 def enter_pin(ser):
@@ -17,10 +20,7 @@ def enter_pin(ser):
 
     if response_history[-1]["status"] == "ERROR":
         response = {"status": "CPIN ERROR", "response_history": response_history}
-        #print("\n---->" + json.dumps(response))
         return(response)
-
-    #do while response != 0,1 y ver si hacerlo saltar despues de que pase 2 o 3 veces
     
     cmd_response = send_cmd("AT+CEREG?", ser, 4, print_response=True, ms_of_delay_after=15000)
     response_history.append(cmd_response)
@@ -34,9 +34,8 @@ def enter_pin(ser):
         #listo adelante
         print("0,1")
     else:
-        #error ni idea que esta pasando :(
+        #error ni idea que esta pasando
         response = {"status": "NB-IOT CONECTION ERROR", "message": detailed_response,"response_history": response_history}
-        #print("\n---->" + json.dumps(response))
         return(response)
 
     return(ser)

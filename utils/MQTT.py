@@ -1,6 +1,9 @@
+import sys
+sys.path.append( '..' )
+
 import serial
 
-from send_cmd import send_cmd
+from serial_tools.send_cmd import send_cmd
 from constants import MY_PHONE_PASS
 
 DEFALUT_PRINT_RESPONSE = True
@@ -40,8 +43,6 @@ def connect_to_mqtt_server(
     password = DEFEULT_PASSWORD,
     print_response=DEFALUT_PRINT_RESPONSE,
     ):
-    # cmd_response = send_cmd('AT+QMTCONN=0,"topic","password o string secreto"', ser,  print_response=print_response)
-
     cmd_response = send_cmd(
         "AT+QMTCONN=" + str(tcp_connect_id) + ",\"" + username + "\",\"" + password + "\"", 
         ser,  
@@ -70,7 +71,7 @@ def check_connection_to_mqtt_server(
         print(cmd_response)
         print(cmd_response.get('response')[1])
 
-        if cmd_response.get('response')[1].find('OK') is not -1:
+        if cmd_response.get('response')[1].find('OK') != -1:
             print(cmd_response.get('response')[1].find('OK'))
             return(cmd_response)
         if cmd_response.get('response')[1].split(str(tcp_connect_id) + ",",1)[1][0] == '3':
@@ -91,7 +92,6 @@ def publish_mqtt_message(
     retain = DEFAULT_RETAIN,
     print_response=DEFALUT_PRINT_RESPONSE
     ):
-    # agregar que se termine la espera de la respuesta cuando se encuentra un >
     cmd_response = send_cmd(
         "AT+QMTPUB=" + 
         str(tcp_connect_id) + "," + 
@@ -128,5 +128,3 @@ def subscribe_to_mqtt_topic(ser,  print_response=DEFALUT_PRINT_RESPONSE):
     cmd_response = send_cmd("AT+QMTUNS=0,1,\"mychannel\"", ser,  print_response=print_response)
     print(cmd_response)
     return(cmd_response)
-
-# cmd_response = send_cmd("AT+QMTPUB=" + str(tcp_connect_id) + "," + str(msgID) + "," + str(qos) + "," + str(retain) + "," + "\"" + topic + "\"," + str(len(str_to_send)),ser,  custom_response_end='>',print_response=print_response)

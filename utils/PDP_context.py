@@ -1,6 +1,9 @@
+import sys
+sys.path.append( '..' )
+
 import serial
 
-from send_cmd import send_cmd
+from serial_tools.send_cmd import send_cmd
 from constants import MY_PHONE_PASS
 
 def setup_PDP_context(ser, id=1, response_history=[], retries=3, custom_delay=2000, print_response=True):
@@ -11,7 +14,6 @@ def setup_PDP_context(ser, id=1, response_history=[], retries=3, custom_delay=20
             return(check_PDP_response)
         else:
             activate_PDP_response = activate_PDP_context(ser, id, retries=retries, response_history=response_history, custom_delay=custom_delay, print_response=print_response)
-            #response_history.append(activate_PDP_response['response_history'])
             status=activate_PDP_response['status']
             retries-=1
 
@@ -23,7 +25,6 @@ def optimized_setup_PDP_context(ser, id=1, response_history=[], retries=3, custo
             return(check_PDP_response)
         else:
             activate_PDP_response = activate_PDP_context(ser, id, retries=retries, response_history=response_history, custom_delay=custom_delay, print_response=print_response)
-            #response_history.append(activate_PDP_response['response_history'])
             status=activate_PDP_response['status']
             retries-=1
 

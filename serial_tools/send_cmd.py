@@ -1,3 +1,6 @@
+import sys
+sys.path.append( '..' )
+
 import serial
 import serial.tools.list_ports
 
@@ -26,7 +29,6 @@ def read_extra_lines(
         res = res.decode("utf-8")
         if print_response: 
             print('> ' + res)
-        #res = res.rstrip()
         response_lines.append(res)
 
         if (res.find('OK') == 0):
@@ -41,7 +43,6 @@ def read_extra_lines(
 
     if print_final_response: 
         print('> ' + res)
-    # print(response_lines)
     return(get_response(response_lines, "UNFINISHED"))
 
 
@@ -56,15 +57,13 @@ def send_cmd(
     custom_response_end='',
     ):
     
-    def get_response(response, 
-    status):
+    def get_response(response, status):
         if ms_of_delay_after: sleep(ms_of_delay_after/1000)
         return({"response": response, "status": status, "cmd": cmd})
 
     ser.reset_input_buffer()
 
     if ms_of_delay_before: sleep(ms_of_delay_before/1000)
-
 
     cmd = cmd + "\r"
     ser.write(cmd.encode())
@@ -76,7 +75,6 @@ def send_cmd(
         res = res.decode("utf-8")
         if print_response: 
             print('> ' + res)
-        #res = res.rstrip()
         response_lines.append(res)
 
         if (res.find('OK') == 0):
@@ -97,5 +95,4 @@ def send_cmd(
 
     if print_final_response: 
         print('> ' + res)
-    # print(response_lines)
     return(get_response(response_lines, "UNFINISHED"))

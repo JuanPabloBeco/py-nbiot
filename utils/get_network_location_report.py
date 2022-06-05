@@ -1,5 +1,8 @@
+import sys
+sys.path.append( '..' )
+
 import serial
-from send_cmd import send_cmd
+from serial_tools.send_cmd import send_cmd
 from datetime import datetime
 import json
 
@@ -36,7 +39,7 @@ def get_network_location_report(ser):
     print('\n\n')
 
     return outDictionary
-    
+
 # ser = serial.Serial(port='COM3', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
-# acquire_signal_quality_report(ser)
+# get_network_location_report(ser)
 # ser.close()

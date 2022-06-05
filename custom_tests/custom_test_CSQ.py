@@ -1,18 +1,22 @@
-from get_network_location_report import get_network_location_report
+import sys
+
+sys.path.append( '..' )
+
+from utils.get_network_location_report import get_network_location_report
 from constants import MY_PHONE_PASS
-from configuration import optimized_start_up_nbiot
-from PDP_context import optimized_setup_PDP_context
-from MQTT import publish_mqtt_message, open_mqtt_network, connect_to_mqtt_server, check_connection_to_mqtt_server
+from utils.configuration import optimized_start_up_nbiot
+from utils.PDP_context import optimized_setup_PDP_context
+from utils.MQTT import publish_mqtt_message, open_mqtt_network, connect_to_mqtt_server, check_connection_to_mqtt_server
 
 import serial
 import serial.tools.list_ports
-from print_cmd_history import print_cmd_history
-from send_cmd import send_cmd
+from serial_tools.print_cmd_history import print_cmd_history
+from serial_tools.send_cmd import send_cmd
 
 from datetime import datetime
 from time import sleep
-from acquire_signal_quality_report import acquire_signal_quality_report
-from acquire_GNSS_position import turn_on_GNSS, acquire_GNSS_position, turn_off_GNSS
+from utils.acquire_signal_quality_report import acquire_signal_quality_report
+from utils.acquire_GNSS_position import turn_on_GNSS, acquire_GNSS_position, turn_off_GNSS
 
 import csv
 
@@ -24,11 +28,13 @@ Run on just turned on nb-iot modem
 
 '''
 
+DEFAULT_COM_PORT = 'COM3'
+
 def custom_test_CSQ(ser=-1):
     list = serial.tools.list_ports.comports()
     print(*list)
     if (ser == -1):
-        ser = serial.Serial(port='COM3', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
+        ser = serial.Serial(port=DEFAULT_COM_PORT, baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
     
     f = open("test.txt", "a")
 
@@ -59,8 +65,7 @@ def custom_test_CSQ(ser=-1):
     while True:
         f = open("test.txt", "a")
 
-        cmd_response = send_cmd("AT+CSQ", ser, 
-    print_final_response=False, )
+        cmd_response = send_cmd("AT+CSQ", ser, print_final_response=False)
         readingTime = datetime.now()
 
         f.write(str(cmd_response['response'][1][-7:-5]))
@@ -89,19 +94,11 @@ def custom_test_acquire_signal_quality_and_GNSS_position(ser=-1, s_of_delay=1):
     list = serial.tools.list_ports.comports()
     print(*list)
     if (ser == -1):
-        ser = serial.Serial(port='COM3', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
+        ser = serial.Serial(port=DEFAULT_COM_PORT, baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
     
     startTime = datetime.now()
-
     log_file_name = "nbiot_test_mvd_v2_" + startTime.strftime('%Y_%m_%d_%H_%M_%S') + ".csv" # ".txt"
-
-    # f = open("test_" + str(startTime) +".txt", "w")
     f = open(log_file_name, "w")
-    
-    # f.write("\n\n\n")
-    # f.write("Start CSQ test at - ")
-    # f.write(str(startTime))
-    # f.write("\n")
 
     
     response = optimized_start_up_nbiot(ser)
@@ -111,15 +108,6 @@ def custom_test_acquire_signal_quality_and_GNSS_position(ser=-1, s_of_delay=1):
     print(response)
 
     connectingTime = datetime.now()
-
-    # f.write("\n")
-    # f.write("End connecting at - ")
-    # f.write(str(connectingTime))
-    # f.write("\n")
-
-    # f.write("Start sending CSQ")
-    # f.write("\n")
-    # f.write("\n")
 
     f.write("rssi,ber,status,date,utc,lat,lng,hdop,altitude,fix,cog,spkm,spkn,nsat")
     f.write("\n")
@@ -137,9 +125,6 @@ def custom_test_acquire_signal_quality_and_GNSS_position(ser=-1, s_of_delay=1):
 
         response = turn_on_GNSS(ser, 1, 1, 0, 1) # dejar encendido el GPS para poder aprobechar el tiempo de sleep en fijar la posicion
         print(response)
-        
-        # csv.DictWriter(csvfile)
-        # writer.writerow(data)
 
         print("step summary:")
 
@@ -218,11 +203,6 @@ def custom_test_acquire_signal_quality_and_GNSS_position(ser=-1, s_of_delay=1):
 
         print("/n/n")
 
-        # m_of_delay = 
-        # s_of_delay = m_of_delay/60
-        # s_of_delay = 1
-
-
         sleep(s_of_delay)
     # print_cmd_history(response)
 
@@ -231,17 +211,16 @@ def custom_test_acquire_signal_quality_and_GNSS_position(ser=-1, s_of_delay=1):
     return response
 
 def custom_test_acquire_signal_quality_with_network_information(ser=-1, s_of_delay=1, activate_gnss=False):
-    list = serial.tools.list_ports.comports()
-    print(*list)
-    if (ser == -1):
-        ser = serial.Serial(port='COM3', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
-    
     startTime = datetime.now()
 
     log_file_name = "nbiot_test_mvd_v2_" + startTime.strftime('%Y_%m_%d_%H_%M_%S') + ".csv" # ".txt"
 
-    # f = open("test_" + str(startTime) +".txt", "w")
     f = open(log_file_name, "w")
+
+    list = serial.tools.list_ports.comports()
+    print(*list)
+    if (ser == -1):
+        ser = serial.Serial(port=DEFAULT_COM_PORT, baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
     
     
     response = optimized_start_up_nbiot(ser)
@@ -276,9 +255,6 @@ def custom_test_acquire_signal_quality_with_network_information(ser=-1, s_of_del
         if activate_gnss:
             response = turn_on_GNSS(ser, 1, 1, 0, 1) # dejar encendido el GPS para poder aprobechar el tiempo de sleep en fijar la posicion
             print(response)
-        
-        # csv.DictWriter(csvfile)
-        # writer.writerow(data)
 
         print("step summary:")
 
@@ -351,18 +327,9 @@ def custom_test_acquire_signal_quality_with_network_information(ser=-1, s_of_del
 
         print("/n/n")
 
-        # m_of_delay = 
-        # s_of_delay = m_of_delay/60
-        # s_of_delay = 1
-
-
         sleep(s_of_delay)
     # print_cmd_history(response)
 
     ser.close()
 
     return response
-
-
-# custom_test_acquire_signal_quality_and_GNSS_position()
-custom_test_acquire_signal_quality_with_network_information(s_of_delay=5, activate_gnss=False)

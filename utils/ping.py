@@ -1,6 +1,9 @@
+import sys
+sys.path.append( '..' )
+
 import serial
 
-from send_cmd import send_cmd, read_extra_lines
+from serial_tools.send_cmd import send_cmd, read_extra_lines
 from constants import MY_PHONE_PASS
 
 def ping(ser, 

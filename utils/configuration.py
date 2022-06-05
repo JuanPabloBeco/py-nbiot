@@ -1,7 +1,10 @@
+import sys
+sys.path.append( '..' )
+
 import serial
 import json
 
-from send_cmd import send_cmd
+from serial_tools.send_cmd import send_cmd
 from constants import MY_PHONE_PASS
 
 
@@ -86,13 +89,13 @@ def check_nbiot_conection(ser, retries=3, response_history=[], custom_delay=2000
         elif stat == "0":
             retries = retries -1
             if retries == 0:
-                message = "Not registered. MT is not currently searching an operator to register to - " + detailed_res
+                message = "Not registered. MT is not currently searching an operator to register to - "# + detailed_res
                 status = "ERROR"
                 break
         elif stat == "2":
             retries = retries -1
             if retries == 0:
-                message = "Not registered, but MT is currently trying to attach or searching an operator to register to - " + detailed_res
+                message = "Not registered, but MT is currently trying to attach or searching an operator to register to - "# + detailed_res
                 status = "ERROR"
                 break
         elif stat == "3":
@@ -120,4 +123,4 @@ def check_nbiot_conection(ser, retries=3, response_history=[], custom_delay=2000
 def turn_off(ser, response_history=[]):
     cmd_response = send_cmd("AT+QPOWD", ser,  print_response=True, ms_of_delay_after=1000)
     response_history.append(cmd_response)        
-    return({"response_history": response_history, "status": status, "message": message})
+    return({"response_history": response_history, "status": "OK", "message": "Turned off"})

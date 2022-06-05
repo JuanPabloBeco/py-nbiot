@@ -1,5 +1,8 @@
+import sys
+sys.path.append( '..' )
+
 import serial
-from send_cmd import send_cmd
+from serial_tools.send_cmd import send_cmd
 from datetime import datetime
 import json
 
@@ -8,27 +11,6 @@ import json
 '''
 def acquire_GNSS_position(ser, retries=3): 
     print('acquire_signal_quality_report')
-    # cmd_response = send_cmd("AT+QGPSLOC=2", ser, print_final_response=False)
-    # response = cmd_response['response'][1][0:-2]
-    # status=cmd_response['status']
-
-    
-    # print(json.dumps(cmd_response, sort_keys=True, indent=4))
-
-
-    # is_error = response.split("ERROR: ")
-    # if len(is_error) != 1:
-    #     error_number = is_error[1]
-    #     if error_number != '516':
-    #         response.status = 'ERROR'
-    #         return response
-    #     i=0
-    #     for i in range(6):
-    #         cmd_response = send_cmd("AT+QGPSLOC=2", ser, print_final_response=False)
-    #         error_number = response.split("ERROR: ")[1]
-            
-    #         if error_number=='516' && i < 3:
-            
 
     for i in range(retries-1):
         cmd_response = send_cmd("AT+QGPSLOC=2", ser, print_final_response=False, ms_of_delay_before=1000*(i+1))
@@ -113,8 +95,3 @@ def turn_off_GNSS(ser):
     print(cmd_response)
     print('\n')
     return(cmd_response)
-
-# ser = serial.Serial(port='COM3', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
-# turn_on_GNSS(ser, 1, 1, 0, 1)
-# acquire_GNSS_position(ser)
-# ser.close()

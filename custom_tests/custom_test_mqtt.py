@@ -1,18 +1,23 @@
+import sys
+
+sys.path.append( '..' )
+
 from constants import MY_PHONE_PASS
-from configuration import optimized_start_up_nbiot
-from PDP_context import optimized_setup_PDP_context
-from MQTT import publish_mqtt_message, open_mqtt_network, connect_to_mqtt_server, check_connection_to_mqtt_server
+from utils.configuration import optimized_start_up_nbiot
+from utils.PDP_context import optimized_setup_PDP_context
+from utils.MQTT import publish_mqtt_message, open_mqtt_network, connect_to_mqtt_server, check_connection_to_mqtt_server
 
 import serial
 import serial.tools.list_ports
-from print_cmd_history import print_cmd_history
-from send_cmd import send_cmd
+from serial_tools.print_cmd_history import print_cmd_history
+from serial_tools.send_cmd import send_cmd
 
 from datetime import datetime
 
+from time import sleep
 
 '''
-The objective of this test is to measure the energy needed to send a message of different length
+The objective of this test is to measure the energy needed to publish messages of different lengths
 using mqtt protocol
 
 Observation: To measure energy further hardware is needed
@@ -23,7 +28,7 @@ def custom_test_mqtt(ser=-1, msg_length=10, nbiot_connected = False):
     list = serial.tools.list_ports.comports()
     print(*list)
     if (ser == -1):
-        ser = serial.Serial(port='COM4', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
+        ser = serial.Serial(port='COM3', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
     if not nbiot_connected:
         response = optimized_start_up_nbiot(ser)
 
@@ -57,17 +62,9 @@ def custom_test_mqtt(ser=-1, msg_length=10, nbiot_connected = False):
         diff = end-start
         print('tiempo: ' + str(diff))
         cmd_response = send_cmd("AT+CSQ", ser)
-    
-    
-
-    # print_cmd_history(response)
 
     ser.close()
-
     return response
-
-
-custom_test_mqtt()
 
 def custom_test_mqtt_iterative(
     ser=-1, 
@@ -75,16 +72,23 @@ def custom_test_mqtt_iterative(
     msg_length_end=100, 
     msg_length_step_size=10, 
     nbiot_connected = False,
+    is_connected_to_mqtt_broker = True,
     wait=True,
     ):
     list = serial.tools.list_ports.comports()
     print(*list)
     if (ser == -1):
-        ser = serial.Serial(port='COM4', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
+        ser = serial.Serial(port='COM3', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
     
     if not nbiot_connected:
         response = optimized_start_up_nbiot(ser)
         response = optimized_setup_PDP_context(ser, response_history=response["response_history"], retries=3, custom_delay=1000)
+    
+    if not is_connected_to_mqtt_broker:
+        open_mqtt_network(ser)
+        sleep(1)
+        connect_to_mqtt_server(ser)
+        sleep(1)
 
     for msg_length in range(msg_length_start, msg_length_end+1, msg_length_step_size):
         start = datetime.now()
@@ -94,25 +98,10 @@ def custom_test_mqtt_iterative(
         print('tiempo: ' + str(diff) + '\n')
         # if wait & msg_length < msg_length_end: # corregir para que no se llame la ultima vez
             # input(str(msg_length) + " - press Enter to continue...")
-        cmd_response = send_cmd("AT+CSQ", ser)
 
-    # print_cmd_history(response)
+        cmd_response = send_cmd("AT+CSQ", ser, ms_of_delay_before=5000 )
+
     ser.close()
     return response
 
-'''
-
-from setup_serial_connection import *
-custom_test_connection.custom_test_connection(ser)
-ser = serial.Serial(port='COM4', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=5)
-MQTT.open_mqtt_network(ser)
-MQTT.connect_to_mqtt_server(ser)
-ser.close()
-custom_test_mqtt.custom_test_mqtt_iterative(msg_length_start=50, msg_length_end=100, msg_length_step_size=50, wait=False, already_connected=True)
-custom_test_mqtt.custom_test_mqtt(msg_length=16, already_connected = True)
-'''
-
-'''
-send_cmd("AT+QMTPUB=" + str(tcp_connect_id) + "," + str(msgID) + "," + str(qos) + "," + str(retain) + "," + "\"" + topic + "\"," + str(len(str_to_send)),ser,  custom_response_end='>',print_response=print_response)
-send_cmd(str_to_send, ser,  print_response=print_response)
-'''
+custom_test_mqtt_iterative(msg_length_start=10, msg_length_end=1010, msg_length_step_size=250, nbiot_connected = True, wait=False)
