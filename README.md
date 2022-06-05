@@ -1,4 +1,4 @@
-# Heading level 1 py-nbiot
+# py-nbiot
 Python library to manage Quectel BG-95 NB-IoT module
 
 ## Contents:
