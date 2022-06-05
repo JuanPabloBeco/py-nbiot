@@ -1,16 +1,20 @@
-# py-nbiot
+# Heading level 1 py-nbiot
 Python library to manage Quectel BG-95 NB-IoT module
 
-Contents:
+## Contents:
 
-serial_tools 
-    Serial management functions to set up and send AT commands
+### serial_tools 
 
-custom_tests
-    Connection, signal intensity and MQTT custom tests
+Serial management functions to set up and send AT commands
 
-NB_IoT_course_tests
-    Examples of CSQ and MQTT tests ready to run
+### custom_tests
 
-utils
-    Functions to configure and use the NB-IoT modem
+Connection, signal intensity and MQTT custom tests
+
+### NB_IoT_course_tests
+
+Examples of CSQ and MQTT tests ready to run
+
+### utils
+
+Functions to configure and use the NB-IoT modem
